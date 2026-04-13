@@ -8,950 +8,262 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
-
   :root {
-    --gold: #C9A84C;
-    --gold-light: #E8C97A;
-    --dark: #1A1208;
-    --panel: #111007;
-    --surface: #1E1A0E;
-    --border: rgba(201,168,76,0.2);
-    --text: #F5EDD6;
-    --muted: rgba(245,237,214,0.55);
-    --success: #4CAF77;
-    --error: #E05757;
+    --gold: #C9A84C; --gold-light: #E8C97A; --dark: #1A1208; --surface: #1E1A0E;
+    --border: rgba(201,168,76,0.2); --text: #F5EDD6; --muted: rgba(245,237,214,0.55);
+    --success: #4CAF77; --error: #E05757;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
-    background: var(--dark);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
+    background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh;
     background-image:
       radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.12) 0%, transparent 60%),
       url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
-
-  .app {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 24px 80px;
-  }
-
-  header {
-    text-align: center;
-    margin-bottom: 48px;
-    padding-bottom: 32px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-
-  header::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  }
-
-  .logo-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 12px;
-  }
-
-  .logo-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
-  }
-
-  h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--gold-light);
-    letter-spacing: 0.5px;
-  }
-
-  .subtitle {
-    color: var(--muted);
-    font-size: 0.9rem;
-    font-weight: 300;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-top: 6px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
-  }
-
-  .card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    color: var(--gold);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .card-title .step-badge {
-    width: 26px; height: 26px;
-    background: rgba(201,168,76,0.15);
-    border: 1px solid rgba(201,168,76,0.35);
-    border-radius: 50%;
-    font-size: 0.75rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    color: var(--gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .upload-zone {
-    border: 2px dashed rgba(201,168,76,0.3);
-    border-radius: 12px;
-    padding: 32px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    position: relative;
-  }
-
-  .upload-zone:hover, .upload-zone.drag-over {
-    border-color: var(--gold);
-    background: rgba(201,168,76,0.05);
-  }
-
-  .upload-zone input[type=file] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-  }
-
-  .upload-icon { font-size: 2rem; margin-bottom: 10px; }
-
-  .upload-label {
-    font-size: 0.9rem;
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .upload-hint {
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  .file-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(201,168,76,0.08);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-top: 12px;
-    font-size: 0.85rem;
-    color: var(--gold-light);
-  }
-
-  .file-info .remove-btn {
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0 4px;
-    transition: color 0.2s;
-  }
-
-  .file-info .remove-btn:hover { color: var(--error); }
-
-  /* Data tabs */
-  .source-section { margin-bottom: 20px; }
-
-  .tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-
-  .tab-btn {
-    padding: 8px 18px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .tab-btn.active {
-    background: rgba(201,168,76,0.15);
-    border-color: var(--gold);
-    color: var(--gold);
-  }
-
-  .tab-btn:hover:not(.active) {
-    border-color: rgba(201,168,76,0.4);
-    color: var(--text);
-  }
-
-  .data-table-wrap {
-    overflow-x: auto;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    max-height: 280px;
-    overflow-y: auto;
-  }
-
-  .data-table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
-  .data-table-wrap::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
-  .data-table-wrap::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 3px; }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-  }
-
-  th {
-    background: rgba(201,168,76,0.1);
-    color: var(--gold);
-    font-weight: 600;
-    text-align: left;
-    padding: 10px 14px;
-    white-space: nowrap;
-    position: sticky;
-    top: 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  td {
-    padding: 9px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: var(--text);
-    white-space: nowrap;
-  }
-
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(201,168,76,0.04); }
-
-  /* Config section */
-  .config-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  @media (max-width: 600px) {
-    .config-grid { grid-template-columns: 1fr; }
-  }
-
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .field-group.full { grid-column: 1 / -1; }
-
-  label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  input[type=text], select, textarea {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.88rem;
-    transition: border-color 0.2s;
-    width: 100%;
-  }
-
-  input[type=text]:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--gold);
-    background: rgba(201,168,76,0.05);
-  }
-
-  select option { background: #1E1A0E; color: var(--text); }
-
-  /* Format checkboxes */
-  .format-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .format-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    user-select: none;
-  }
-
-  .format-option input[type=checkbox] { display: none; }
-
-  .format-option.checked {
-    background: rgba(201,168,76,0.12);
-    border-color: var(--gold);
-    color: var(--gold);
-  }
-
-  .format-option:not(.checked) { color: var(--muted); }
-
-  .format-option:hover { border-color: rgba(201,168,76,0.4); color: var(--text); }
-
-  .format-icon { font-size: 1.1rem; }
-
-  /* Generate button */
-  .generate-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 16px 32px;
-    background: linear-gradient(135deg, var(--gold) 0%, #A8892E 100%);
-    border: none;
-    border-radius: 12px;
-    color: #1A1208;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    letter-spacing: 0.3px;
-    transition: all 0.25s;
-    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
-    margin-top: 8px;
-  }
-
-  .generate-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(201,168,76,0.45);
-  }
-
-  .generate-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  /* Progress */
-  .progress-wrap {
-    margin-top: 20px;
-    display: none;
-  }
-
-  .progress-bar-bg {
-    height: 6px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold), var(--gold-light));
-    border-radius: 3px;
-    transition: width 0.3s ease;
-    width: 0%;
-  }
-
-  .progress-text {
-    font-size: 0.82rem;
-    color: var(--muted);
-    text-align: center;
-  }
-
-  /* Log */
-  .log-box {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 10px;
-    padding: 14px;
-    margin-top: 16px;
-    max-height: 180px;
-    overflow-y: auto;
-    font-family: 'Courier New', monospace;
-    font-size: 0.78rem;
-    display: none;
-  }
-
-  .log-entry { padding: 2px 0; }
-  .log-entry.ok { color: var(--success); }
-  .log-entry.err { color: var(--error); }
-  .log-entry.info { color: var(--muted); }
-
-  /* Results */
-  .results {
-    display: none;
-    margin-top: 20px;
-  }
-
-  .result-items {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .result-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(76,175,119,0.07);
-    border: 1px solid rgba(76,175,119,0.2);
-    border-radius: 10px;
-    padding: 12px 16px;
-  }
-
-  .result-icon { font-size: 1.3rem; }
-  .result-name { font-size: 0.88rem; color: var(--text); flex: 1; }
-  .result-count { font-size: 0.78rem; color: var(--muted); }
-
-  .download-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 16px;
-    background: rgba(76,175,119,0.15);
-    border: 1px solid rgba(76,175,119,0.35);
-    border-radius: 8px;
-    color: var(--success);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-  }
-
-  .download-btn:hover {
-    background: rgba(76,175,119,0.25);
-    transform: translateY(-1px);
-  }
-
-  .notice {
-    background: rgba(201,168,76,0.07);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-size: 0.83rem;
-    color: var(--muted);
-    margin-top: 16px;
-    line-height: 1.6;
-  }
-
-  .notice strong { color: var(--gold); }
-
-  .counter-badge {
-    display: inline-block;
-    background: rgba(201,168,76,0.15);
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 20px;
-    padding: 2px 10px;
-    font-size: 0.75rem;
-    color: var(--gold);
-    margin-left: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-  }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 20px 0;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 30px;
-    color: var(--muted);
-    font-size: 0.85rem;
-  }
+  .app { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { text-align: center; margin-bottom: 40px; padding-bottom: 28px; border-bottom: 1px solid var(--border); position: relative; }
+  header::after { content:''; position:absolute; bottom:-1px; left:50%; transform:translateX(-50%); width:80px; height:2px; background:linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .logo-row { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:12px; }
+  .logo-icon { width:48px; height:48px; background:linear-gradient(135deg, var(--gold), var(--gold-light)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 4px 20px rgba(201,168,76,0.3); }
+  h1 { font-family:'Playfair Display', serif; font-size:2rem; color:var(--gold-light); }
+  .subtitle { color:var(--muted); font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; margin-top:6px; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; margin-bottom:24px; position:relative; overflow:hidden; }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent); }
+  .card-title { font-family:'Playfair Display', serif; font-size:1.1rem; color:var(--gold); margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+  .step-badge { width:26px; height:26px; background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.35); border-radius:50%; font-size:0.75rem; font-weight:600; color:var(--gold); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .upload-zone { border:2px dashed rgba(201,168,76,0.3); border-radius:12px; padding:32px 20px; text-align:center; cursor:pointer; transition:all .25s ease; position:relative; }
+  .upload-zone:hover { border-color:var(--gold); background:rgba(201,168,76,0.05); }
+  .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+  .upload-icon { font-size:2rem; margin-bottom:10px; }
+  .upload-label { font-size:.9rem; color:var(--text); font-weight:500; }
+  .upload-hint { font-size:.78rem; color:var(--muted); margin-top:4px; }
+  .file-info { display:flex; align-items:center; gap:10px; background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); border-radius:8px; padding:10px 14px; margin-top:12px; font-size:.85rem; color:var(--gold-light); }
+  .counter-badge { display:inline-block; background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.3); border-radius:20px; padding:2px 10px; font-size:.75rem; color:var(--gold); margin-left:8px; font-weight:500; }
+  .data-table-wrap { overflow:auto; border-radius:10px; border:1px solid var(--border); max-height:320px; }
+  table { width:100%; border-collapse:collapse; font-size:.82rem; }
+  th { background:rgba(201,168,76,0.1); color:var(--gold); font-weight:600; text-align:left; padding:10px 14px; white-space:nowrap; position:sticky; top:0; border-bottom:1px solid var(--border); }
+  td { padding:9px 14px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text); white-space:nowrap; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(201,168,76,0.04); }
+  .empty-state { text-align:center; padding:30px; color:var(--muted); font-size:.85rem; }
+  .generate-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:16px 32px; background:linear-gradient(135deg, var(--gold) 0%, #A8892E 100%); border:none; border-radius:12px; color:#1A1208; font-size:1rem; font-weight:600; cursor:pointer; letter-spacing:.3px; transition:all .25s; box-shadow:0 4px 20px rgba(201,168,76,0.3); margin-top:8px; }
+  .generate-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 30px rgba(201,168,76,0.45); }
+  .generate-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+  .progress-wrap, .log-box, .results { margin-top:20px; display:none; }
+  .progress-bar-bg { height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; margin-bottom:10px; }
+  .progress-bar-fill { height:100%; background:linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius:3px; transition:width .3s ease; width:0%; }
+  .progress-text { font-size:.82rem; color:var(--muted); text-align:center; }
+  .log-box { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:14px; max-height:180px; overflow-y:auto; font-family:'Courier New', monospace; font-size:.78rem; }
+  .log-entry { padding:2px 0; } .log-entry.ok{color:var(--success)} .log-entry.err{color:var(--error)} .log-entry.info{color:var(--muted)}
+  .result-items { display:flex; flex-direction:column; gap:10px; }
+  .result-item { display:flex; align-items:center; gap:12px; background:rgba(76,175,119,0.07); border:1px solid rgba(76,175,119,0.2); border-radius:10px; padding:12px 16px; }
+  .download-btn { display:flex; align-items:center; gap:6px; padding:7px 16px; background:rgba(76,175,119,0.15); border:1px solid rgba(76,175,119,0.35); border-radius:8px; color:var(--success); font-size:.82rem; font-weight:600; text-decoration:none; }
+  .download-btn:hover { background:rgba(76,175,119,0.25); }
+  .notice { background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:12px 16px; font-size:.83rem; color:var(--muted); margin-top:16px; line-height:1.6; }
+  .notice strong { color:var(--gold); }
 </style>
 </head>
 <body>
 <div class="app">
-
   <header>
-    <div class="logo-row">
-      <div class="logo-icon">🎓</div>
-      <h1>Certificate Generator</h1>
-    </div>
+    <div class="logo-row"><div class="logo-icon">🎓</div><h1>Certificate Generator</h1></div>
     <p class="subtitle">MIHCA — Otomasi Pembuatan Ijazah</p>
   </header>
 
-  <!-- Step 1: Upload Template -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">1</span> Upload Template PPT/PPTX</div>
-    <div class="upload-zone" id="pptZone">
-      <input type="file" id="pptFile" accept=".ppt,.pptx" />
+    <div class="card-title"><span class="step-badge">1</span>Upload Template PPTX</div>
+    <div class="upload-zone">
+      <input type="file" id="pptFile" accept=".pptx,.ppt" />
       <div class="upload-icon">📋</div>
-      <div class="upload-label">Klik atau seret file template ijazah</div>
-      <div class="upload-hint">Format: .ppt atau .pptx</div>
+      <div class="upload-label">Klik untuk pilih template ijazah</div>
+      <div class="upload-hint">Gunakan .pptx dan placeholder {{Name}}, {{Regist}}, {{Certi}}, {{Start Date}}, {{End Date}}</div>
     </div>
     <div id="pptInfo" style="display:none"></div>
   </div>
 
-  <!-- Step 2: Upload Data Excel -->
   <div class="card">
-    <div class="card-title">
-      <span class="step-badge">2</span>
-      Upload Data Excel
-      <span class="counter-badge" id="totalCount">0 siswa</span>
+    <div class="card-title"><span class="step-badge">2</span>Upload Data Excel <span class="counter-badge" id="totalCount">0 siswa</span></div>
+    <div class="upload-zone">
+      <input type="file" id="excelFile" accept=".xlsx,.xls" />
+      <div class="upload-icon">📊</div>
+      <div class="upload-label">Upload satu file Excel data siswa</div>
+      <div class="upload-hint">Header yang didukung: Name atau First Name + Surname, Start Date, End Date, Regist, Certi</div>
     </div>
-
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
-      <div class="upload-zone" style="flex:1; min-width:200px; padding:20px 14px;">
-        <input type="file" id="excelCA" accept=".xlsx,.xls" />
-        <div class="upload-icon">📊</div>
-        <div class="upload-label" style="font-size:0.82rem;">Data CA (Culinary Arts)</div>
-        <div class="upload-hint" id="caHint">—</div>
-      </div>
-      <div class="upload-zone" style="flex:1; min-width:200px; padding:20px 14px;">
-        <input type="file" id="excelHK" accept=".xlsx,.xls" />
-        <div class="upload-icon">📊</div>
-        <div class="upload-label" style="font-size:0.82rem;">Data HK (Housekeeping)</div>
-        <div class="upload-hint" id="hkHint">—</div>
-      </div>
-      <div class="upload-zone" style="flex:1; min-width:200px; padding:20px 14px;">
-        <input type="file" id="excelFB" accept=".xlsx,.xls" />
-        <div class="upload-icon">📊</div>
-        <div class="upload-label" style="font-size:0.82rem;">Data FB (Food & Beverage)</div>
-        <div class="upload-hint" id="fbHint">—</div>
-      </div>
-    </div>
-
-    <!-- Preview data -->
-    <div id="dataPreview" style="display:none;">
-      <div class="tabs" id="dataTabs"></div>
-      <div id="dataTableContainer"></div>
-    </div>
-    <div class="empty-state" id="emptyState">Upload minimal satu file Excel untuk melihat preview data</div>
+    <div id="excelInfo" style="display:none"></div>
+    <div id="dataPreview" style="display:none; margin-top:16px;"></div>
+    <div class="empty-state" id="emptyState">Belum ada data Excel yang diupload</div>
   </div>
 
-  <!-- Step 3: Config -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">3</span> Konfigurasi Konten Ijazah</div>
-
-    <div class="config-grid">
-      <div class="field-group">
-        <label>Program CA (Culinary Arts)</label>
-        <input type="text" id="progCA" value="Culinary Arts Program" />
-      </div>
-      <div class="field-group">
-        <label>Program HK (Housekeeping)</label>
-        <input type="text" id="progHK" value="Housekeeping Program" />
-      </div>
-      <div class="field-group">
-        <label>Program FB (Food & Beverage)</label>
-        <input type="text" id="progFB" value="Food and Beverage Services Program" />
-      </div>
-      <div class="field-group">
-        <label>Kota Penerbitan</label>
-        <input type="text" id="cityField" value="Jakarta" />
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="field-group" style="margin-bottom:16px;">
-      <label>Format Output (pilih satu atau keduanya)</label>
-      <div class="format-row">
-        <label class="format-option checked" id="fmtPptxLabel">
-          <input type="checkbox" id="fmtPptx" checked onchange="toggleFormat('pptx')"/>
-          <span class="format-icon">📑</span> ZIP of PPTX (satu file per siswa)
-        </label>
-        <label class="format-option" id="fmtPdfLabel">
-          <input type="checkbox" id="fmtPdf" onchange="toggleFormat('pdf')"/>
-          <span class="format-icon">📄</span> ZIP of PDF (perlu konversi manual)
-        </label>
-      </div>
-    </div>
-
-    <div class="notice">
-      <strong>Info:</strong> Aplikasi ini akan mengganti placeholder di template PPTX seperti {{Name}}, {{Regist}}, {{Certi}}, {{Start Date}}, {{End Date}}, {{Program}}, dan {{City}}. File dibuat satu PPTX per siswa lalu dikumpulkan dalam ZIP. Untuk PDF, hasil PPTX perlu dibuka di PowerPoint/LibreOffice lalu di-export manual — atau gunakan tool konversi batch.
-    </div>
-  </div>
-
-  <!-- Step 4: Generate -->
-  <div class="card">
-    <div class="card-title"><span class="step-badge">4</span> Generate Ijazah</div>
-
-    <button class="generate-btn" id="genBtn" onclick="startGeneration()" disabled>
-      <span>⚡</span> Generate Semua Ijazah
-    </button>
-
+    <div class="card-title"><span class="step-badge">3</span>Generate Ijazah</div>
+    <button class="generate-btn" id="genBtn" onclick="startGeneration()" disabled><span>⚡</span>Generate Semua Ijazah</button>
+    <div class="notice"><strong>Catatan:</strong> Bagian konfigurasi program dan city sudah dihapus. Aplikasi sekarang fokus hanya mengganti placeholder dari Excel ke template. Kalau file template masih .ppt, simpan ulang dulu ke .pptx.</div>
     <div class="progress-wrap" id="progressWrap">
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progressFill"></div>
-      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
       <div class="progress-text" id="progressText">Memproses...</div>
     </div>
-
     <div class="log-box" id="logBox"></div>
-
     <div class="results" id="resultsWrap">
-      <div class="divider"></div>
-      <div class="card-title" style="margin-bottom:12px;">✅ Selesai! Download file ijazah:</div>
+      <div class="card-title" style="margin-top:20px; margin-bottom:12px;">✅ Selesai! Download file ijazah:</div>
       <div class="result-items" id="resultItems"></div>
     </div>
   </div>
-
 </div>
 
 <script>
-// ============================================================
-// State
-// ============================================================
-const state = {
-  pptxFile: null,       // ArrayBuffer of template pptx
-  pptxName: '',
-  students: {
-    CA: [], HK: [], FB: []
-  },
-  formats: { pptx: true, pdf: false }
-};
+const state = { pptxFile: null, pptxName: '', isPpt: false, students: [] };
 
-// ============================================================
-// UI helpers
-// ============================================================
-function toggleFormat(f) {
-  state.formats[f] = !state.formats[f];
-  document.getElementById('fmt' + f.charAt(0).toUpperCase() + f.slice(1) + 'Label')
-    .classList.toggle('checked', state.formats[f]);
-  validateBtn();
-}
+function norm(v) { return String(v || '').trim().toLowerCase().replace(/\s+/g, ' '); }
+function escHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escXml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;'); }
+function showFileInfo(id, text) { const el = document.getElementById(id); el.style.display = 'flex'; el.className = 'file-info'; el.innerHTML = `<span>✅</span><span>${text}</span>`; }
+function validateBtn() { document.getElementById('genBtn').disabled = !(state.pptxFile && state.students.length); }
+function updateCounter() { document.getElementById('totalCount').textContent = `${state.students.length} siswa`; validateBtn(); }
+function log(msg, type='info') { const box = document.getElementById('logBox'); box.style.display = 'block'; const el = document.createElement('div'); el.className = 'log-entry ' + type; el.textContent = msg; box.appendChild(el); box.scrollTop = box.scrollHeight; }
+function setProgress(pct, msg) { document.getElementById('progressFill').style.width = pct + '%'; document.getElementById('progressText').textContent = msg; }
 
-function validateBtn() {
-  const hasTemplate = !!state.pptxFile;
-  const hasData = state.students.CA.length + state.students.HK.length + state.students.FB.length > 0;
-  const hasFormat = state.formats.pptx || state.formats.pdf;
-  document.getElementById('genBtn').disabled = !(hasTemplate && hasData && hasFormat);
-}
-
-function updateCounter() {
-  const total = state.students.CA.length + state.students.HK.length + state.students.FB.length;
-  document.getElementById('totalCount').textContent = total + ' siswa';
-  validateBtn();
-}
-
-function log(msg, type='info') {
-  const box = document.getElementById('logBox');
-  box.style.display = 'block';
-  const el = document.createElement('div');
-  el.className = 'log-entry ' + type;
-  el.textContent = msg;
-  box.appendChild(el);
-  box.scrollTop = box.scrollHeight;
-}
-
-function setProgress(pct, msg) {
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = msg;
-}
-
-// ============================================================
-// PPT Upload
-// ============================================================
-document.getElementById('pptFile').addEventListener('change', async function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  state.pptxName = file.name;
-
-  // We need to convert .ppt → handled client-side by reading as ArrayBuffer
-  const buf = await file.arrayBuffer();
-
-  // If .ppt (binary), we store and note that JSZip won't handle it
-  if (file.name.endsWith('.ppt')) {
-    // Store raw — we'll note limitation
-    state.pptxFile = buf;
-    state.isPpt = true;
-    showFileInfo('pptInfo', '⚠️ ' + file.name + ' — Format lama (.ppt). Untuk hasil terbaik gunakan .pptx. Aplikasi akan mencoba menggunakan template ini.');
-  } else {
-    state.pptxFile = buf;
-    state.isPpt = false;
-    showFileInfo('pptInfo', '✅ ' + file.name);
+function excelDateToText(value) {
+  if (value === null || value === undefined || value === '') return '';
+  if (typeof value === 'number') {
+    const parsed = XLSX.SSF.parse_date_code(value);
+    if (parsed) {
+      const d = new Date(parsed.y, parsed.m - 1, parsed.d);
+      return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
   }
-  validateBtn();
-});
-
-function showFileInfo(id, text) {
-  const el = document.getElementById(id);
-  el.style.display = 'flex';
-  el.className = 'file-info';
-  el.innerHTML = `<span>📋</span><span>${text}</span>`;
+  return String(value).trim();
 }
 
-// ============================================================
-// Excel Upload
-// ============================================================
-async function readExcel(file, dept) {
+function findHeaderRow(rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const lowered = rows[i].map(norm);
+    if (lowered.includes('name') || lowered.includes('first name') || lowered.includes('regist') || lowered.includes('certi')) return i;
+  }
+  return -1;
+}
+
+async function readExcel(file) {
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, { cellDates: false });
   const ws = wb.Sheets[wb.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+  const rows = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+  const headerIdx = findHeaderRow(rows);
+  if (headerIdx === -1) throw new Error('Header tidak ditemukan. Pastikan ada kolom Name/First Name, Regist, Certi, Start Date, End Date.');
 
-  // Find header row (supports Name or split First Name / Surname)
-  let headerIdx = -1;
-  for (let i = 0; i < rows.length; i++) {
-    const lowered = rows[i].map(c => String(c).trim().toLowerCase());
-    if (lowered.includes('name') || lowered.includes('first name') || lowered.includes('student id')) {
-      headerIdx = i;
-      break;
-    }
-  }
-  if (headerIdx === -1) { alert('Header tidak ditemukan di file ' + file.name); return []; }
+  const headers = rows[headerIdx].map(h => String(h || '').trim());
+  const idx = (...candidates) => headers.findIndex(h => candidates.includes(norm(h)));
 
-  const headers = rows[headerIdx].map(h => String(h).trim());
-  const norm = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
-  const findIdx = (candidates) => headers.findIndex(h => candidates.includes(norm(h)));
-
-  const nameIdx = findIdx(['name']);
-  const firstNameIdx = findIdx(['first name','firstname']);
-  const surnameIdx = findIdx(['surname','last name','lastname']);
-  const startIdx = findIdx(['start date','startdate']);
-  const endIdx = findIdx(['end date','enddate']);
-  const registIdx = findIdx(['regist','registration no','registration number','registration']);
-  const certiIdx = findIdx(['certi','certificate no','certificate number','certificate']);
+  const nameIdx = idx('name');
+  const firstNameIdx = idx('first name', 'firstname');
+  const surnameIdx = idx('surname', 'last name', 'lastname');
+  const registIdx = idx('regist', 'registration no', 'registration number', 'registration');
+  const certiIdx = idx('certi', 'certificate no', 'certificate number', 'certificate');
+  const startIdx = idx('start date', 'startdate');
+  const endIdx = idx('end date', 'enddate');
 
   const students = [];
-  for (let i = headerIdx + 1; i < rows.length; i++) {
-    const row = rows[i];
-
+  for (let r = headerIdx + 1; r < rows.length; r++) {
+    const row = rows[r];
     let name = '';
     if (nameIdx !== -1) {
       name = String(row[nameIdx] || '').trim();
     } else {
       const first = String(firstNameIdx !== -1 ? row[firstNameIdx] || '' : '').trim();
       const sur = String(surnameIdx !== -1 ? row[surnameIdx] || '' : '').trim();
-      name = (first + ' ' + sur).trim();
+      name = `${first} ${sur}`.trim();
     }
+    const regist = registIdx !== -1 ? String(row[registIdx] || '').trim() : '';
+    const certi = certiIdx !== -1 ? String(row[certiIdx] || '').trim() : '';
+    const startDate = startIdx !== -1 ? excelDateToText(row[startIdx]) : '';
+    const endDate = endIdx !== -1 ? excelDateToText(row[endIdx]) : '';
 
-    if (!name) continue;
-
-    students.push({
-      name,
-      startDate: String(startIdx !== -1 ? row[startIdx] || '' : '').trim(),
-      endDate: String(endIdx !== -1 ? row[endIdx] || '' : '').trim(),
-      regist: String(registIdx !== -1 ? row[registIdx] || '' : '').trim(),
-      certi: String(certiIdx !== -1 ? row[certiIdx] || '' : '').trim(),
-      dept
-    });
+    if (!name && !regist && !certi) continue;
+    students.push({ name, regist, certi, startDate, endDate });
   }
   return students;
 }
 
-function setupExcelUpload(inputId, dept, hintId) {
-  document.getElementById(inputId).addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const students = await readExcel(file, dept);
-    state.students[dept] = students;
-    document.getElementById(hintId).textContent = students.length + ' siswa';
-    document.getElementById(hintId).style.color = '#C9A84C';
-    renderDataPreview();
-    updateCounter();
-  });
-}
-
-setupExcelUpload('excelCA', 'CA', 'caHint');
-setupExcelUpload('excelHK', 'HK', 'hkHint');
-setupExcelUpload('excelFB', 'FB', 'fbHint');
-
-// ============================================================
-// Data Preview
-// ============================================================
-let activeTab = null;
-
-function renderDataPreview() {
-  const depts = ['CA','HK','FB'].filter(d => state.students[d].length > 0);
-  if (depts.length === 0) {
-    document.getElementById('dataPreview').style.display = 'none';
+function renderPreview() {
+  const wrap = document.getElementById('dataPreview');
+  if (!state.students.length) {
+    wrap.style.display = 'none';
     document.getElementById('emptyState').style.display = 'block';
     return;
   }
-  document.getElementById('dataPreview').style.display = 'block';
   document.getElementById('emptyState').style.display = 'none';
-
-  // Tabs
-  const tabsEl = document.getElementById('dataTabs');
-  tabsEl.innerHTML = '';
-  depts.forEach(d => {
-    const labels = {CA:'Culinary Arts',HK:'Housekeeping',FB:'Food & Beverage'};
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (d === (activeTab || depts[0]) ? ' active' : '');
-    btn.textContent = labels[d] + ' (' + state.students[d].length + ')';
-    btn.onclick = () => { activeTab = d; renderDataPreview(); };
-    tabsEl.appendChild(btn);
-  });
-  if (!activeTab || !depts.includes(activeTab)) activeTab = depts[0];
-
-  // Table
-  const students = state.students[activeTab];
-  const container = document.getElementById('dataTableContainer');
-  container.innerHTML = `<div class="data-table-wrap">
-    <table>
-      <thead><tr>
-        <th>#</th><th>Nama</th><th>Start Date</th><th>End Date</th><th>Reg. No</th><th>Cert. No</th>
-      </tr></thead>
-      <tbody>${students.map((s,i) => `<tr>
-        <td style="color:var(--muted)">${i+1}</td>
-        <td><strong>${escHtml(s.name)}</strong></td>
-        <td>${escHtml(s.startDate)}</td>
-        <td>${escHtml(s.endDate)}</td>
-        <td style="color:var(--gold-light)">${escHtml(s.regist)}</td>
-        <td style="color:var(--gold-light)">${escHtml(s.certi)}</td>
-      </tr>`).join('')}</tbody>
-    </table>
-  </div>`;
+  wrap.style.display = 'block';
+  wrap.innerHTML = `<div class="data-table-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Regist</th><th>Certi</th><th>Start Date</th><th>End Date</th></tr></thead><tbody>${state.students.map((s,i)=>`<tr><td>${i+1}</td><td><strong>${escHtml(s.name)}</strong></td><td>${escHtml(s.regist)}</td><td>${escHtml(s.certi)}</td><td>${escHtml(s.startDate)}</td><td>${escHtml(s.endDate)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function replaceAllTokens(xml, replacements) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xml, 'application/xml');
 
-// ============================================================
-// Core: Modify PPTX XML for each student
-// ============================================================
-const PROGRAMS = {
-  CA: () => document.getElementById('progCA').value,
-  HK: () => document.getElementById('progHK').value,
-  FB: () => document.getElementById('progFB').value,
-};
+  const paragraphs = Array.from(xmlDoc.getElementsByTagName('a:p'));
+  for (const p of paragraphs) {
+    const textNodes = Array.from(p.getElementsByTagName('a:t'));
+    if (!textNodes.length) continue;
 
-function escXml(str) {
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&apos;');
+    let combined = textNodes.map(n => n.textContent || '').join('');
+    let changed = false;
+
+    for (const [token, value] of Object.entries(replacements)) {
+      if (combined.includes(token)) {
+        combined = combined.split(token).join(String(value || ''));
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      textNodes[0].textContent = combined;
+      for (let i = 1; i < textNodes.length; i++) {
+        textNodes[i].textContent = '';
+      }
+    }
+  }
+
+  let out = new XMLSerializer().serializeToString(xmlDoc);
+
+  // fallback: direct string replace for tokens that were not split across runs
+  for (const [token, value] of Object.entries(replacements)) {
+    out = out.split(token).join(escXml(value));
+  }
+
+  return out;
 }
 
 async function generatePptxForStudent(templateBuf, student) {
   const zip = await JSZip.loadAsync(templateBuf);
-
-  const slideFiles = Object.keys(zip.files).filter(n => n.match(/^ppt\/slides\/slide\d+\.xml$/));
+  const slideFiles = Object.keys(zip.files).filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n));
+  if (!slideFiles.length) throw new Error('Slide tidak ditemukan di template PPTX.');
 
   const replacements = {
-    '{{Name}}': student.name || '',
-    '{{NAME}}': student.name || '',
-    '{{Regist}}': student.regist || '',
-    '{{REGIST}}': student.regist || '',
-    '{{Certi}}': student.certi || '',
-    '{{CERTI}}': student.certi || '',
-    '{{Start Date}}': student.startDate || '',
-    '{{StartDate}}': student.startDate || '',
-    '{{START DATE}}': student.startDate || '',
-    '{{End Date}}': student.endDate || '',
-    '{{EndDate}}': student.endDate || '',
-    '{{END DATE}}': student.endDate || '',
-    '{{Program}}': PROGRAMS[student.dept](),
-    '{{PROGRAM}}': PROGRAMS[student.dept](),
-    '{{City}}': document.getElementById('cityField').value || '',
-    '{{CITY}}': document.getElementById('cityField').value || ''
+    '{{Name}}': student.name || '', '{{NAME}}': student.name || '',
+    '{{Regist}}': student.regist || '', '{{REGIST}}': student.regist || '',
+    '{{Certi}}': student.certi || '', '{{CERTI}}': student.certi || '',
+    '{{Start Date}}': student.startDate || '', '{{StartDate}}': student.startDate || '', '{{START DATE}}': student.startDate || '',
+    '{{End Date}}': student.endDate || '', '{{EndDate}}': student.endDate || '', '{{END DATE}}': student.endDate || ''
   };
 
   for (const slidePath of slideFiles) {
     let xml = await zip.files[slidePath].async('string');
-
-    for (const [token, value] of Object.entries(replacements)) {
-      xml = xml.split(token).join(escXml(value));
-    }
-
-    // fallback for older hardcoded templates
-    xml = xml.replace(/<a:t>\s*Reyner Wreno\s*<\/a:t>/g, '<a:t>' + escXml(student.name || '') + '</a:t>');
-    xml = xml.replace(/Food and Beverage Services Program/g, escXml(PROGRAMS[student.dept]()));
-    xml = xml.replace(/Culinary Arts Program/g, escXml(PROGRAMS[student.dept]()));
-    xml = xml.replace(/Housekeeping Program/g, escXml(PROGRAMS[student.dept]()));
-
+    xml = replaceAllTokens(xml, replacements);
     zip.file(slidePath, xml);
   }
-
-  return await zip.generateAsync({type:'arraybuffer', compression:'DEFLATE', compressionOptions:{level:6}});
+  return await zip.generateAsync({ type:'arraybuffer', compression:'DEFLATE', compressionOptions:{ level:6 } });
 }
 
-// ============================================================
-// Main generation
-// ============================================================
 async function startGeneration() {
-  const allStudents = [
-    ...state.students.CA,
-    ...state.students.HK,
-    ...state.students.FB
-  ];
-  if (allStudents.length === 0) { alert('Tidak ada data siswa!'); return; }
-  if (!state.pptxFile) { alert('Upload template PPT/PPTX dulu!'); return; }
+  if (!state.students.length) return alert('Upload data Excel dulu.');
+  if (!state.pptxFile) return alert('Upload template PPTX dulu.');
+  if (state.isPpt) return alert('Format .ppt tidak bisa diproses langsung. Simpan ulang dulu menjadi .pptx lalu upload lagi.');
 
-  // Check if it's .ppt format (cannot process with JSZip)
-  if (state.isPpt) {
-    alert('Format .ppt (PowerPoint 97-2003) tidak bisa diproses langsung oleh aplikasi ini.\n\nSilakan:\n1. Buka file di PowerPoint atau LibreOffice\n2. Save As → PowerPoint Presentation (.pptx)\n3. Upload kembali file .pptx tersebut.');
-    return;
-  }
-
-  // Test if template is valid PPTX (ZIP)
   try {
     const testZip = await JSZip.loadAsync(state.pptxFile);
-    const slides = Object.keys(testZip.files).filter(n => n.match(/^ppt\/slides\/slide\d+\.xml$/));
-    if (slides.length === 0) throw new Error('No slides found');
-  } catch(e) {
-    alert('File template tidak valid atau berformat .ppt.\n\nSilakan convert ke .pptx terlebih dahulu.\n\nCaranya:\n1. Buka di PowerPoint / LibreOffice Impress\n2. File → Save As → PowerPoint Presentation (.pptx)');
-    return;
+    const slides = Object.keys(testZip.files).filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n));
+    if (!slides.length) throw new Error();
+  } catch {
+    return alert('File template tidak valid. Gunakan file .pptx yang benar.');
   }
 
   document.getElementById('genBtn').disabled = true;
@@ -960,69 +272,57 @@ async function startGeneration() {
   document.getElementById('logBox').style.display = 'block';
   document.getElementById('resultsWrap').style.display = 'none';
 
-  log('Memulai generasi ' + allStudents.length + ' ijazah...', 'info');
+  const outZip = new JSZip();
+  const total = state.students.length;
+  let done = 0;
 
-  const resultZips = {};
-  // Generate per dept
-  const depts = ['CA','HK','FB'].filter(d => state.students[d].length > 0);
-
-  let processed = 0;
-  const total = allStudents.length;
-
-  for (const dept of depts) {
-    const students = state.students[dept];
-    if (students.length === 0) continue;
-
-    const deptZip = new JSZip();
-    const labels = {CA:'Culinary_Arts', HK:'Housekeeping', FB:'Food_Beverage'};
-
-    for (const student of students) {
-      try {
-        const pptxBuf = await generatePptxForStudent(state.pptxFile, student);
-        const safeName = student.name.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g,'_');
-        const filename = `${student.certi}_${safeName}.pptx`;
-        deptZip.file(filename, pptxBuf);
-        processed++;
-        setProgress(Math.round(processed / total * 90), `Memproses ${processed}/${total}: ${student.name}`);
-        log(`✓ ${student.name} (${student.certi})`, 'ok');
-      } catch(e) {
-        log(`✗ Error ${student.name}: ${e.message}`, 'err');
-        processed++;
-      }
+  for (const student of state.students) {
+    try {
+      const pptxBuf = await generatePptxForStudent(state.pptxFile, student);
+      const safeName = (student.name || 'student').replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+      const safeCerti = (student.certi || 'NO_CERTI').replace(/[^a-zA-Z0-9\-_.]/g, '_');
+      outZip.file(`${safeCerti}_${safeName}.pptx`, pptxBuf);
+      done++;
+      setProgress(Math.round(done / total * 100), `Memproses ${done}/${total}: ${student.name || safeCerti}`);
+      log(`✓ ${student.name || '(tanpa nama)'} | Regist: ${student.regist || '-'} | Certi: ${student.certi || '-'}`, 'ok');
+    } catch (e) {
+      done++;
+      log(`✗ Error ${student.name || '(tanpa nama)'}: ${e.message}`, 'err');
     }
-
-    setProgress(Math.round(processed / total * 95), 'Membuat ZIP ' + labels[dept] + '...');
-    const zipBlob = await deptZip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
-    resultZips[dept] = { blob: zipBlob, label: labels[dept], count: students.length };
   }
 
-  setProgress(100, 'Selesai!');
-  log('🎉 Generasi selesai! Total: ' + processed + ' ijazah', 'ok');
-
-  // Show results
-  const resultsWrap = document.getElementById('resultsWrap');
-  const resultItems = document.getElementById('resultItems');
-  resultItems.innerHTML = '';
-  resultsWrap.style.display = 'block';
-
-  for (const [dept, data] of Object.entries(resultZips)) {
-    const deptNames = {CA:'Culinary Arts', HK:'Housekeeping', FB:'Food & Beverage'};
-    const url = URL.createObjectURL(data.blob);
-    const item = document.createElement('div');
-    item.className = 'result-item';
-    item.innerHTML = `
-      <span class="result-icon">📦</span>
-      <div>
-        <div class="result-name">ijazah_${data.label}.zip</div>
-        <div class="result-count">${data.count} file PPTX</div>
-      </div>
-      <a class="download-btn" href="${url}" download="ijazah_${data.label}.zip">⬇ Download</a>
-    `;
-    resultItems.appendChild(item);
-  }
-
+  const blob = await outZip.generateAsync({ type:'blob', compression:'DEFLATE', compressionOptions:{ level:6 } });
+  const url = URL.createObjectURL(blob);
+  document.getElementById('resultItems').innerHTML = `<div class="result-item"><span>📦</span><div style="flex:1"><div>ijazah_all.zip</div><div style="font-size:.78rem;color:var(--muted)">${state.students.length} file PPTX</div></div><a class="download-btn" href="${url}" download="ijazah_all.zip">⬇ Download</a></div>`;
+  document.getElementById('resultsWrap').style.display = 'block';
   document.getElementById('genBtn').disabled = false;
 }
+
+document.getElementById('pptFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  state.pptxName = file.name;
+  state.pptxFile = await file.arrayBuffer();
+  state.isPpt = file.name.toLowerCase().endsWith('.ppt');
+  showFileInfo('pptInfo', state.isPpt ? `${file.name} — format .ppt, harap convert ke .pptx` : file.name);
+  validateBtn();
+});
+
+document.getElementById('excelFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    state.students = await readExcel(file);
+    showFileInfo('excelInfo', `${file.name} — ${state.students.length} siswa terbaca`);
+    renderPreview();
+    updateCounter();
+  } catch (err) {
+    state.students = [];
+    renderPreview();
+    updateCounter();
+    alert(err.message);
+  }
+});
 </script>
 </body>
 </html>
